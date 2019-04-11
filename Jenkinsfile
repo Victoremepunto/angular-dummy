@@ -20,7 +20,21 @@ pipeline {
             steps {
                 sh 'npm i'
                 sh 'npm run test-headless'
-                publishCoverage adapters: [istanbulCoberturaAdapter('coverage/angular-unit-testing/cobertura-coverage.xml')], sourceFileResolver: sourceFiles('NEVER_STORE')
+            }
+        }
+      
+        stage('Publish Test results') {
+            agent {
+                docker {
+                    image 'circleci/node:10.15.3-browsers'
+                    reuseNode true
+                }
+            }
+            steps {
+                publishCoverage(
+                    adapters: [istanbulCoberturaAdapter('coverage/angular-unit-testing/cobertura-coverage.xml')],
+                    sourceFileResolver: sourceFiles('STORE_ALL_BUILD')
+               )
             }
         }
     }
